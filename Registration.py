@@ -57,7 +57,12 @@ while True:
     choice = input("Enter your choice: ")
 
     if choice == "1":
-        # Implement authentication here
+        image_path = input("Enter path to your image: ")
+        if authenticate_face(image_path):
+            print("Authentication successful.")
+        else:
+            print("Authentication failed.")
+
         pass
 
     elif choice == "2":
