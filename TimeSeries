@@ -1,0 +1,24 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Assuming you have a database or CSV file with borrowing data
+# Load the data into a Pandas DataFrame
+df = pd.read_csv("borrowing_data.csv")
+
+# Convert the date column to a datetime type
+df['borrow_date'] = pd.to_datetime(df['borrow_date'])
+
+# Set the borrow_date column as the DataFrame index
+df.set_index('borrow_date', inplace=True)
+
+# Resample the data to get borrowing counts per month
+monthly_borrowings = df.resample('M').size()
+
+# Plot the borrowing trends
+plt.figure(figsize=(10, 6))
+plt.plot(monthly_borrowings)
+plt.title("Monthly Book Borrowing Trends")
+plt.xlabel("Date")
+plt.ylabel("Number of Borrowings")
+plt.grid(True)
+plt.show()
