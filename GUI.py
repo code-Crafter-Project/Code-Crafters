@@ -1,51 +1,74 @@
-def open_gui():
-   import tkinter as tk
-   from tkinter import simpledialog, messagebox
-   import random
+import tkinter as tk
+import json
+import subprocess
 
+def register():
+    username = username_entry.get()
+    password = password_entry.get()
+    
+    # Check if the user already exists
+    if username in users:
+        message_label.config(text="User already exists!")
+    else:
+        users[username] = {"password": password, "history": []}
+        save_users()
+        message_label.config(text="Registration successful!")
 
-   root = tk.Tk()
-   root.geometry('500x500')
-   root.title('Integrated Library System')
+def login():
+    username = username_entry.get()
+    password = password_entry.get()
+    
+    # Check if the user exists and password matches
+    if username in users and users[username]["password"] == password:
+        message_label.config(text="Login successful!")
+        # Perform actions after login
+        
+        # Add example history entry
+        users[username]["history"].append("Logged in at: example_time")
+        save_users()
+        
+        # Launch the Jupyter Notebook
+        subprocess.run(["jupyter", "notebook", "AI Rec System.ipynb"], shell=True)
+    else:
+        message_label.config(text="Invalid username or password!")
 
-   root.configure(bg="BLUE")
-   # Function to change the color of a specific label
-   def change_label_color(label):
-   # Generate a random color
-    color = "Light green".format(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
+def save_users():
+    with open('users.json', 'w') as file:
+        json.dump(users, file)
 
-    # Update the label's foreground (text) color
-    label.config(fg=color)
+# Load existing users or create an empty dictionary
+try:
+    with open('users.json', 'r') as file:
+        users = json.load(file)
+except FileNotFoundError:
+    users = {}
 
+# Create the Tkinter window
+window = tk.Tk()
+window.title("Registration and Login")
+window.geometry("300x200")
 
-   Label = tk.Label(root, text='WELCOME TO VANDERBIJLPARK PUBLIC LIBRARY', font=('Bold', 25))
-   Label.pack(padx=10, pady=20)
+# Create the labels, entries, and buttons
+username_label = tk.Label(window, text="Username:")
+username_label.pack()
 
-   Label.configure(bg=root.cget("bg"))
-   change_label_color(Label)
+username_entry = tk.Entry(window)
+username_entry.pack()
 
-   
-   
-   
-   def checkout_book():
-      messagebox.showinfo("Checkout", f"Book checked out successfully!")
-     
-     
-   def checkin_book():
-      messagebox.showinfo("Check-in", f"Book checked in successfully!")
+password_label = tk.Label(window, text="Password:")
+password_label.pack()
 
-   def get_input():
-    result = simpledialog.askstring("Input", "Enter your message:")
-    if result:
-        messagebox.showinfo("Thank You", f"Enquiry received ")
-   # Create two buttons
-   button1 = tk.Button(root, text="Check-Out",command=checkin_book , width=30, height=5, bg="light green", fg="black")
-   button2 = tk.Button(root, text="Check-In", command=checkout_book , width=30, height=5, bg="light green", fg="black")
-   button3 = tk.Button(root, text="Send Enquiries", command=get_input, width=30, height=5, bg="light green", fg="black")
+password_entry = tk.Entry(window, show="*")
+password_entry.pack()
 
-   # Use the pack() manager to place them side by side
-   button1.pack(side=tk.LEFT, padx=100)
-   button2.pack(side=tk.LEFT, padx=100)
-   button3.pack(side=tk.LEFT, padx=100)
+register_button = tk.Button(window, text="Register", command=register)
+register_button.pack()
 
-   root.mainloop()
+login_button = tk.Button(window, text="Login", command=login)
+login_button.pack()
+
+message_label = tk.Label(window, text="")
+message_label.pack()
+
+# Run the Tkinter event loop
+window.mainloop()
